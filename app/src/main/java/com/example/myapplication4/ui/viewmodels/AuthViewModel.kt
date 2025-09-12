@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import com.example.myapplication4.data.User
 
 class AuthViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
@@ -17,6 +18,48 @@ class AuthViewModel : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _currentUser = MutableStateFlow<User?>(null)
+    val currentUser: StateFlow<User?> = _currentUser
+
+    // AuthViewModel.kt - Add this function to the class
+    fun signIn(email: String, password: String) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                _authState.value = AuthState.Loading
+
+                // Check if user exists with this email and password
+                val querySnapshot = db.collection("users")
+                    .whereEqualTo("email", email)
+                    .whereEqualTo("password", password)
+                    .get()
+                    .await()
+
+                if (querySnapshot.isEmpty) {
+                    _authState.value = AuthState.Error("Invalid email or password")
+                    return@launch
+                }
+
+                // Get user data
+                val document = querySnapshot.documents[0]
+                val user = User(
+                    id = document.id,
+                    name = document.getString("name") ?: "",
+                    email = document.getString("email") ?: "",
+                    phone = document.getString("phone") ?: "",
+                    securityAnswer = document.getString("securityAnswer") ?: ""
+                )
+
+                _currentUser.value = user
+                _authState.value = AuthState.Success
+            } catch (e: Exception) {
+                _authState.value = AuthState.Error("Sign in failed: ${e.message}")
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
 
     fun signUp(name: String, email: String, password: String, phone: String, securityAnswer: String) {
         viewModelScope.launch {

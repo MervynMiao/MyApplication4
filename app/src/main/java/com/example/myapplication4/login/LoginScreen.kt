@@ -37,7 +37,7 @@ fun LoginScreen(
         when (authState) {
             is AuthState.Success -> {
                 errorMessage = null
-                // Navigation handled by parent component
+                // Navigation is handled by the parent component (NavGraph)
             }
             is AuthState.Error -> {
                 errorMessage = authState.message

@@ -26,9 +26,10 @@ fun NavGraph() {
     LaunchedEffect(authState.collectAsState().value) {
         when (authState.value) {
             is com.example.myapplication4.ui.viewmodels.AuthState.Success -> {
-                // Navigate to home screen after successful sign up
+                // Navigate to home screen after successful authentication
                 navController.navigate("home") {
-                    popUpTo("signup") { inclusive = true }
+                    // Clear the back stack so user can't go back to auth screens
+                    popUpTo(0) { inclusive = true }
                 }
                 // Reset state after navigation
                 authViewModel.resetState()
@@ -47,7 +48,9 @@ fun NavGraph() {
         composable("login") {
             LoginScreen(
                 navController = navController,
-                onSignIn = { email, password -> /* Handle sign in */ },
+                onSignIn = { email, password ->
+                    authViewModel.signIn(email, password)
+                },
                 authState = authState.collectAsState().value,
                 isLoading = isLoading.collectAsState().value
             )
