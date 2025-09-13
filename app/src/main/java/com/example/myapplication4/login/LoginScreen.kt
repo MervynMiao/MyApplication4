@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.myapplication4.R
+import com.example.myapplication4.components.CenteredTitleTopBar
 import com.example.myapplication4.ui.viewmodels.AuthState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,24 +49,10 @@ fun LoginScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                modifier = Modifier.height(50.dp),
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFFFCEC0),
-                    titleContentColor = Color.Black
-                ),
-                title = {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Login",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                },
+            CenteredTitleTopBar(
+                title = "Login",
+                onBackClick = { navController.popBackStack() },
+                showBackIcon = false // Add this parameter
             )
         }
     ) { innerPadding ->
@@ -192,15 +179,14 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    Row {
-                        Text(
-                            "Forgot password?",
-                            color = Color.Blue,
-                            modifier = Modifier.clickable {
-                                navController.navigate("forgot")
-                            }
-                        )
-                    }
+                    Text(
+                        text = "Forgot Password?",
+                        color = Color.Blue,
+                        modifier = Modifier
+                            .clickable { navController.navigate("forgot") }
+                            .padding(top = 16.dp),
+                        fontWeight = FontWeight.Bold
+                    )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
